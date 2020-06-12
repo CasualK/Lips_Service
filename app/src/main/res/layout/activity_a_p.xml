@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <LinearLayout
+        android:padding="1px"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip1"
+            android:background="@drawable/btn_bg"
+
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip2"
+            android:background="@drawable/btn_bg"
+
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip3"
+            android:background="@drawable/btn_bg"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip4"
+            android:background="@drawable/btn_bg"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip5"
+            android:background="@drawable/btn_bg"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip6"
+            android:background="@drawable/btn_bg"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip7"
+            android:background="@drawable/btn_bg"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip8"
+            android:background="@drawable/btn_bg"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:text=""
+            android:id="@+id/lip9"
+            android:background="@drawable/btn_bg"
+            />
+
+
+    </LinearLayout>
+</ScrollView>
