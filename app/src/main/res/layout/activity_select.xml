@@ -31,7 +31,8 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="적용"
+            android:text="적용하러가기"
+            android:id="@+id/Gchoice"
             />
     </LinearLayout>
 </LinearLayout>

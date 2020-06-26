@@ -21,6 +21,8 @@
         <activity android:name=".ifselect"/>
         <activity android:name=".IF"/>
         <activity android:name=".AP" />
+        <activity android:name=".Choice" />
+        <activity android:name=".used" />
         <activity android:name=".ST"/>
 
     </application>
