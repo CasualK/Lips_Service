@@ -1,42 +1,61 @@
 package com.example.lips_service;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 public class Choice extends AppCompatActivity {
 
-    private static final int PICK_FROM_ALBUM = 1;
-    private static final int PICK_FROM_CAMERA = 2;
-    private static final String TAG = "";
-    private Instant TedPermission;
+    private static final int REQUEST_CODE = 0;
     private ImageView img;
+    final static int PERMISSION_REQUEST_CODE = 1000;
+    private static final int PICK_FROM_ALBUM = 1;
+    private Instant TedPermission;
     private Uri imui;
     private Bitmap imgp;
+    Button CB, AB;
+    private String state;
 
-
-    private File SaveFile;
+    private File file;
 
 
     @Override
@@ -44,24 +63,32 @@ public class Choice extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choice);
 
+        permissionCheck();
+
         img = findViewById(R.id.FaceView);
+        AB = findViewById(R.id.BG);
+
+        File sdcard = Environment.getExternalStorageDirectory();
+        file = new File(sdcard,"face.pjg");
 
 
-        Intent intent = getIntent();
-        int lip_no = intent.getIntExtra("LIPS_COLOR",0);
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (imgp != null) {
+                    imgp = rotate(imgp, 90);
 
+                    img.setImageBitmap(imgp);
+                }
+            }
+        });
 
     }
 
-
-
-    public void btnG(View view){
+    public void btnG(View v){
         GG();
     }
-
-    public void btnC(View view){
-        takePhoto();
-    }
+    public void btnC(View v) { camera();}
 
     private void GG() {
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -69,35 +96,50 @@ public class Choice extends AppCompatActivity {
         startActivityForResult(intent, PICK_FROM_ALBUM);
     }
 
+    public void camera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if(intent.resolveActivity((getPackageManager())) != null) {
+            File photoFile = null;
+            try{
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+
+            }
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,"com.example.lips_service",photoFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(intent, 101);
+            }
+        }
+    }
+
+    String currentPhotoPath;
+
+    private  File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName,".jpg",storageDir);
+
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode != Activity.RESULT_OK) {
 
             Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
 
-            if(SaveFile != null) {
-                if (SaveFile.exists()) {
-                    if (SaveFile.delete()) {
-                        Log.e(TAG, SaveFile.getAbsolutePath() + " 삭제 성공");
-                        SaveFile = null;
-                    }
-                }
-            }
-
             return;
         }
-
         if (requestCode == PICK_FROM_ALBUM) {
-
-
 
             Cursor cursor = null;
 
             try {
-
-
                 InputStream in = getContentResolver().openInputStream(data.getData());
 
                 imgp = BitmapFactory.decodeStream(in);
@@ -105,128 +147,164 @@ public class Choice extends AppCompatActivity {
 
                 img.setImageBitmap(imgp);
 
-
-
             }catch (Exception e)
             {
+            }
+        }
+        if (requestCode == 101 && resultCode == Activity.RESULT_OK) {
 
+            setPic();
+        }
+    }
+
+    private void setPic() {
+        int targetW = img.getWidth();
+        int targetH = img.getHeight();
+
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        imgp = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+        img.setImageBitmap(imgp);
+    }
+
+    private void permissionCheck() {
+        if(Build.VERSION.SDK_INT >= 23) {
+            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+            ArrayList<String> arrayPermission = new ArrayList<String>();
+
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                arrayPermission.add(Manifest.permission.READ_EXTERNAL_STORAGE);
             }
 
+            permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                arrayPermission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
 
-        } else if (requestCode == PICK_FROM_CAMERA) {
-            setImage();
+            if (arrayPermission.size() > 0) {
+                String strArray[] = new String[arrayPermission.size()];
+                strArray = arrayPermission.toArray(strArray);
+                ActivityCompat.requestPermissions(this, strArray, PERMISSION_REQUEST_CODE);
+            } else {
+
+            }
         }
     }
 
-    private void setImage() {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE: {
+                if(grantResults.length < 1) {
+                    Toast.makeText(this, "Failed get permission", Toast.LENGTH_SHORT).show();
+                    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                    return;
+                }
 
+                for (int i=0; i<grantResults.length; i++) {
+                    if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(this,"Permission is denide : " + permissions[i], Toast.LENGTH_SHORT).show();
+                        finish();
+                        return;
+                    }
+                }
 
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-
-        Bitmap originalBm = BitmapFactory.decodeFile(SaveFile.getAbsolutePath(), options);
-
-        img.setImageBitmap(originalBm);
-
-
-
+                Toast.makeText(this, "Permission is granted", Toast.LENGTH_SHORT).show();
+            }
+            break;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    private void takePhoto() {
+    public int rotateImage(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        } return 0;
+    }
 
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    public static Bitmap rotate(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
 
+
+
+    private void saveBit(Bitmap bitmap) {
+        String root = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES).toString();
+        File myDir = new File(root + "/saved_images");
+        myDir.mkdirs();
+        Random generator = new Random();
+
+        int n = 10000;
+        n = generator.nextInt(n);
+        String fname = "Image-"+ n +".jpg";
+        File file = new File (myDir, fname);
+        if (file.exists ()) file.delete ();
         try {
-            SaveFile = createImageFile();
-        } catch (IOException e) {
-            Toast.makeText(this, "이미지 처리 오류! 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
-            finish();
+            FileOutputStream out = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        if (SaveFile != null) {
-
-            Uri photoUri = Uri.fromFile(SaveFile);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-            startActivityForResult(intent, PICK_FROM_CAMERA);
-        }
+        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    }
+                });
     }
 
-    private File createImageFile() throws IOException {
+    public File ScreenShot(View view) {
+        view.setDrawingCacheEnabled(true);
 
+        Bitmap screenBitmap = view.getDrawingCache();
 
-        String timeStamp = new SimpleDateFormat("HHmmss").format(new Date());
-        String imageFileName = "blackJin_" + timeStamp + "_";
-
-        File storageDir = new File(Environment.getExternalStorageDirectory() + "/blackJin/");
-        if (!storageDir.exists()) storageDir.mkdirs();
-
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-
-        return image;
-    }
-
-//    public static void saveBitmaptoJpeg(Bitmap bitmap, String name) {
-//        FileOutputStream out = null;
-//        try {
-//            out = new FileOutputStream("/storage/emulated/0/" + name + ".png");
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                if (out != null) {
-//                    out.close();
-//                }
-//            } catch (IOException e){
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-    private void saveBit(Bitmap bitmap, String name) {
-        File storage = getCacheDir();
-
-        String fileName = name + ".jpg";
-
-        File tempFile = new File(storage, fileName);
-
-        try {
-            tempFile.createNewFile();
-
-            FileOutputStream out = new FileOutputStream(tempFile);
-
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
-
-            out.close();
-        }catch (FileNotFoundException e) {
-            Log.e("MyTag", "FileNotFoundException : " + e.getMessage());
-        }catch (IOException e) {
-            Log.e("MyTag", "IOException : " + e.getMessage());
-        }
-    }
-
-    public void CU (View v) {
-
-        saveBit(imgp, "face");
-        String filename = "faceimage";
-        File file = new File(Environment.getExternalStorageDirectory() + "/Pictures", filename);
+        String filename = "screenshot.png";
+        File file = new File(Environment.getExternalStorageDirectory() + "/Pictures",filename);
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(file);
-            imgp.compress(Bitmap.CompressFormat.PNG, 90, os);
+            screenBitmap.compress(Bitmap.CompressFormat.PNG,90,os);
             os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        view.setDrawingCacheEnabled(false);
+        return file;
+    }
 
-            Toast.makeText(this,"파일 생성 완료!", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(this,"파일 에러!", Toast.LENGTH_SHORT).show();
+
+    public void CU (View v) {
+
+        View rootView = getWindow().getDecorView();
+
+        File screenShot = ScreenShot(rootView);
+        if(screenShot != null){
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(screenShot)));
         }
 
         Intent cu = new Intent(this,used.class);
-
-//        ByteArrayOutputStream faceimg = new ByteArrayOutputStream();
-//        imgp.compress(Bitmap.CompressFormat.JPEG,100,faceimg);
-//        byte[] byteArray = faceimg.toByteArray();
-//        cu.putExtra("image", byteArray);
 
         startActivity(cu);
     }

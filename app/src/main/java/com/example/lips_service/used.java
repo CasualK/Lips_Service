@@ -1,6 +1,7 @@
 package com.example.lips_service;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -12,6 +13,7 @@ import android.graphics.Path;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +23,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -28,7 +32,7 @@ public class used extends AppCompatActivity {
 
     Button reset, save;
     DrawView drawView;
-    Bitmap bb;
+    Bitmap bb, b2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,15 +40,13 @@ public class used extends AppCompatActivity {
         setContentView(R.layout.activity_used);
         setTitle("입술에 발라보세요");
 
-//        Intent cu = getIntent();
-//        byte[] arr = getIntent().getByteArrayExtra("image");
-//        bb = BitmapFactory.decodeByteArray(arr,0,arr.length);
-//        bb = BitmapFactory.decodeResource(getResources(),R.drawable.dada);
-
 
         LinearLayout picture = (LinearLayout) findViewById(R.id.picture);
         drawView = (DrawView) new DrawView(this);
         picture.addView(drawView);
+
+//        byte[] byteArray = getIntent().getByteArrayExtra("image");
+//        b2 = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
         clickIcons();
 
@@ -52,6 +54,16 @@ public class used extends AppCompatActivity {
         Configuration config = r.getConfiguration();
         onConfigurationChanged(config);
     }
+
+    private void load(String path){
+        try {
+            File f = new File(path, "face.jpg");
+            bb = BitmapFactory.decodeStream(new FileInputStream(f));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
         private void clickIcons() {
 
 
@@ -67,13 +79,6 @@ public class used extends AppCompatActivity {
             save = (Button) findViewById(R.id.save);
             save.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-
-                    View rootView = getWindow().getDecorView();
-
-                    File screenShot = ScreenShot(rootView);
-                    if (screenShot != null) {
-                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(screenShot)));
-                    }
 
                 }
             });
@@ -105,7 +110,7 @@ public class used extends AppCompatActivity {
     public class DrawView extends View {
 
         private Paint paint = new Paint();
-        private Path path = new Path();
+        private Path path1 = new Path();
         private int x, y;
         String imagePath = null;
 
@@ -117,7 +122,9 @@ public class used extends AppCompatActivity {
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
-            bb = BitmapFactory.decodeResource(getResources(),R.drawable.dada);
+            BitmapFactory.Options ot = new BitmapFactory.Options();
+            ot.inSampleSize = 2;
+            bb = BitmapFactory.decodeFile("Android/data/com.example.lips_service/files/Pictures/face.jpg",ot);
 
             int picX = (this.getWidth() - bb.getWidth()) / 2;
             int picY = (this.getHeight() - bb.getHeight()) / 2;
@@ -132,7 +139,7 @@ public class used extends AppCompatActivity {
 
             paint.setStrokeWidth(8);
 
-            canvas.drawPath(path, paint);
+            canvas.drawPath(path1, paint);
         }
 
         @Override
@@ -142,13 +149,13 @@ public class used extends AppCompatActivity {
 
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    path.moveTo(x, y);
+                    path1.moveTo(x, y);
                     break;
                 case MotionEvent.ACTION_MOVE:
                     x = (int) event.getX();
                     y = (int) event.getY();
 
-                    path.lineTo(x, y);
+                    path1.lineTo(x, y);
                     break;
             }
             invalidate();
