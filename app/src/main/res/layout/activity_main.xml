@@ -14,14 +14,14 @@
         android:layout_weight="3"
         android:background="@drawable/btn_bg">
 
-        <Button
+        <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/applying"
             android:layout_gravity="center"
-            android:text = "APPLYING"
             android:autoSizeTextType="uniform"
             android:background="@drawable/btn_bg"
+            android:src="@drawable/lipg"
             android:onClick="CA"/>
     </LinearLayout>
     <LinearLayout
@@ -30,12 +30,12 @@
         android:layout_weight="3"
         android:background="@drawable/btn_bg">
 
-        <Button
+        <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/info"
             android:layout_gravity="center"
-            android:text = "INFO"
+            android:src="@drawable/lipi"
             android:autoSizeTextType="uniform"
             android:background="@drawable/btn_bg"
             android:onClick="CI"/>
@@ -47,12 +47,12 @@
         android:background="@drawable/btn_bg"
         >
 
-        <Button
+        <ImageButton
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/storage"
             android:layout_gravity="center"
-            android:text = "STORAGE"
+            android:src="@drawable/lipo"
             android:autoSizeTextType="uniform"
             android:background="@drawable/btn_bg"
             android:onClick="CB"/>

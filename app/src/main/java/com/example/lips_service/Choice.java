@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -53,6 +54,7 @@ public class Choice extends AppCompatActivity {
     private Uri imui;
     private Bitmap imgp;
     Button CB, AB;
+    int red, green, blue;
     private String state;
 
     private File file;
@@ -68,8 +70,14 @@ public class Choice extends AppCompatActivity {
         img = findViewById(R.id.FaceView);
         AB = findViewById(R.id.BG);
 
-        File sdcard = Environment.getExternalStorageDirectory();
-        file = new File(sdcard,"face.pjg");
+        Intent intent = getIntent();
+
+        red = intent.getIntExtra("red",red);
+        green = intent.getIntExtra("green",green);
+        blue = intent.getIntExtra("blue",blue);
+
+//        File sdcard = Environment.getExternalStorageDirectory();
+//        file = new File(sdcard,"face.pjg");
 
 
         img.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +145,7 @@ public class Choice extends AppCompatActivity {
         }
         if (requestCode == PICK_FROM_ALBUM) {
 
-            Cursor cursor = null;
+                Cursor cursor = null;
 
             try {
                 InputStream in = getContentResolver().openInputStream(data.getData());
@@ -244,34 +252,36 @@ public class Choice extends AppCompatActivity {
 
 
 
-    private void saveBit(Bitmap bitmap) {
-        String root = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES).toString();
-        File myDir = new File(root + "/saved_images");
-        myDir.mkdirs();
-        Random generator = new Random();
+    private File saveBit(ImageView imageView) {
+        imageView.setDrawingCacheEnabled(true);
 
-        int n = 10000;
-        n = generator.nextInt(n);
-        String fname = "Image-"+ n +".jpg";
-        File file = new File (myDir, fname);
-        if (file.exists ()) file.delete ();
+        Bitmap ddr = imageView.getDrawingCache();
+
+        String pa =  Environment.getExternalStorageDirectory()+"/";
+
+        String ppa = pa + "fdr/sample/";
+
+        File dir = new File(ppa);
         try {
-            FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            out.flush();
-            out.close();
-
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    public void onScanCompleted(String path, Uri uri) {
-                        Log.i("ExternalStorage", "Scanned " + path + ":");
-                        Log.i("ExternalStorage", "-> uri=" + uri);
-                    }
-                });
+
+        String filename = "face.png";
+        File file = new File(Environment.getExternalStorageDirectory() +"/fdr/sample", filename);
+        FileOutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            ddr.compress(Bitmap.CompressFormat.PNG, 90, os);
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        imageView.setDrawingCacheEnabled(false);
+        return file;
     }
 
     public File ScreenShot(View view) {
@@ -297,14 +307,16 @@ public class Choice extends AppCompatActivity {
 
     public void CU (View v) {
 
-        View rootView = getWindow().getDecorView();
-
-        File screenShot = ScreenShot(rootView);
-        if(screenShot != null){
-            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(screenShot)));
+        File save = saveBit(img);
+        if(save != null){
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(save)));
         }
 
+
         Intent cu = new Intent(this,used.class);
+        cu.putExtra("red",red);
+        cu.putExtra("green",green);
+        cu.putExtra("blue",blue);
 
         startActivity(cu);
     }

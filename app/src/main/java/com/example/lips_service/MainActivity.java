@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
         startActivity(CIC);
     }
     public void CB(View v) {
-        Intent CBC = new Intent(MainActivity.this,ST.class);
-        startActivity(CBC);
+        Intent CIC = new Intent(MainActivity.this,ST.class);
+        startActivity(CIC);
     }
 }
 

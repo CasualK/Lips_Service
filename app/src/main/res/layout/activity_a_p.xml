@@ -13,70 +13,87 @@
 
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:text=""
             android:id="@+id/lip1"
-            android:background="@drawable/btn_bg"
-
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/isoi1"
+            android:text="[ISOI] BR- Lip Treatment Balm "
+
+            android:textColor="#ea0000" />
+
+        <Button
             android:id="@+id/lip2"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
             android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/isoi2"
+            android:text="[ISOI] BR- Lip Treatment Balm "
 
-            />
+            android:textColor="#ff69b4" />
+
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:text=""
             android:id="@+id/lip3"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/sp1"
+            android:text="[Siero Cosmetic] Speed Plump"
+            android:textColor="#b62020" />
+
+        <Button
             android:id="@+id/lip4"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/sp2"
+            android:text="[Siero Cosmetic] Speed Plump"
+            android:textColor="#E9967A" />
+
+        <Button
             android:id="@+id/lip5"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip3"
+            android:text="[에뛰드 하우스] 베러 립스-톡 벨벳 로제 와인"
+            android:textColor="#CC6666" />
+
+        <Button
             android:id="@+id/lip6"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip4"
+            android:text="[에뛰드 하우스] 베러 립스-톡 벨벳 로제 와인"
+            android:textColor="#CC3366" />
+
+        <Button
             android:id="@+id/lip7"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip5"
+            android:text="[에뛰드 하우스] 베러 립스-톡 벨벳 로제 와인"
+            android:textColor="#CC0033" />
+
+        <Button
             android:id="@+id/lip8"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
-            android:id="@+id/lip9"
             android:background="@drawable/btn_bg"
-            />
+            android:drawableLeft="@drawable/lip6"
+            android:text="[에뛰드 하우스] 베러 립스-톡 벨벳 로제 와인"
+            android:textColor="#CC3300" />
+
+        <Button
+            android:id="@+id/lip9"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip7"
+            android:text="[에뛰드 하우스] 베러 립스-톡 벨벳 로제 와인"
+            android:textColor="#FF6666" />
 
 
     </LinearLayout>

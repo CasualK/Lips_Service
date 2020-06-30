@@ -13,70 +13,80 @@
 
 
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:text=""
             android:id="@+id/iflip1"
-            android:background="@drawable/btn_bg"
-
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/isoi1"
+            android:text="[ISOI] BR- Lip Treatment Balm"
+
+            android:textColor="#ea0000" />
+
+        <Button
             android:id="@+id/iflip2"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
             android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/isoi2"
 
-            />
+            android:text="" />
+
         <Button
-            android:layout_width="match_parent"
-            android:layout_height="90dp"
-            android:text=""
             android:id="@+id/iflip3"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/sp1"
+            android:text="" />
+
+        <Button
             android:id="@+id/iflip4"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/sp2"
+            android:text="[Siero Cosmetic] Speed Plump"
+            android:textColor="#E9967A" />
+
+        <Button
             android:id="@+id/iflip5"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip3"
+            android:text="" />
+
+        <Button
             android:id="@+id/iflip6"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip4"
+            android:text="" />
+
+        <Button
             android:id="@+id/iflip7"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip5"
+            android:text="" />
+
+        <Button
             android:id="@+id/iflip8"
-            android:background="@drawable/btn_bg"
-            />
-        <Button
             android:layout_width="match_parent"
             android:layout_height="90dp"
-            android:text=""
-            android:id="@+id/iflip9"
             android:background="@drawable/btn_bg"
-            />
+            android:drawableLeft="@drawable/lip6"
+            android:text="" />
+
+        <Button
+            android:id="@+id/iflip9"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="@drawable/btn_bg"
+            android:drawableLeft="@drawable/lip7"
+            android:text="" />
 
 
     </LinearLayout>

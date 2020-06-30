@@ -13,6 +13,7 @@ import android.graphics.Path;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,18 +28,28 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class used extends AppCompatActivity {
 
     Button reset, save;
     DrawView drawView;
     Bitmap bb, b2;
+    int red, green, blue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_used);
         setTitle("입술에 발라보세요");
+
+        Intent intent = getIntent();
+
+        red = intent.getIntExtra("red",red);
+        green = intent.getIntExtra("green",green);
+        blue = intent.getIntExtra("blue",blue);
 
 
         LinearLayout picture = (LinearLayout) findViewById(R.id.picture);
@@ -79,29 +90,53 @@ public class used extends AppCompatActivity {
             save = (Button) findViewById(R.id.save);
             save.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
+//                    View rootView = getWindow().getDecorView();
 
+                    File screenShot = ScreenShot(drawView);
+                    if(screenShot != null){
+                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.fromFile(screenShot)));
+                    }
                 }
             });
         }
         public File ScreenShot(View view) {
-            drawView.setDrawingCacheEnabled(true);
+            view.setDrawingCacheEnabled(true);
 
-            Bitmap facesave = drawView.getDrawingCache();
+            Bitmap dd = Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.RGB_565);
 
-            String filename = "saveface.png";
-            File file = new File(Environment.getExternalStorageDirectory() + "Pictures",filename);
+            Canvas c = new Canvas(dd);
+            view.draw(c);
+
+            Bitmap screenBitmap = view.getDrawingCache();
+            Date day = new Date();
+            SimpleDateFormat dde = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.KOREA);
+
+            String pa = Environment.getExternalStorageDirectory() + "/";
+
+            String ppa = pa + "fdr/save/";
+
+            File dir = new File(ppa);
+            try {
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            String filename = String.valueOf(dde.format(day) + ".png");
+            File file = new File(Environment.getExternalStorageDirectory() + "/fdr/save",filename);
             FileOutputStream os = null;
             try {
                 os = new FileOutputStream(file);
-                facesave.compress(Bitmap.CompressFormat.PNG,90,os);
+                dd.compress(Bitmap.CompressFormat.PNG,90,os);
                 os.close();
-                Toast.makeText(this,"저장 완료!", Toast.LENGTH_SHORT).show();
-            }catch (IOException e) {
+                Toast.makeText(this,filename + "저장 되었습니다.",Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(this,"파일 에러!", Toast.LENGTH_SHORT).show();
                 return null;
             }
-            drawView.setDrawingCacheEnabled(false);
+            view.setDrawingCacheEnabled(false);
             return file;
 
         }
@@ -122,9 +157,10 @@ public class used extends AppCompatActivity {
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
+
             BitmapFactory.Options ot = new BitmapFactory.Options();
-            ot.inSampleSize = 2;
-            bb = BitmapFactory.decodeFile("Android/data/com.example.lips_service/files/Pictures/face.jpg",ot);
+            ot.inSampleSize = 1;
+            bb = BitmapFactory.decodeFile( Environment.getExternalStorageDirectory() + "/fdr/sample/face.png",ot);
 
             int picX = (this.getWidth() - bb.getWidth()) / 2;
             int picY = (this.getHeight() - bb.getHeight()) / 2;
@@ -133,11 +169,12 @@ public class used extends AppCompatActivity {
 
             bb.recycle();
 
-            paint.setARGB(80, 250, 30, 55);
+            paint.setARGB(80, red, green, blue);
 
             paint.setStyle(Paint.Style.STROKE);
 
             paint.setStrokeWidth(8);
+
 
             canvas.drawPath(path1, paint);
         }
